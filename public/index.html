@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Chat Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>💬 ChatHub</h1>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-page="chats">
+                    <span class="icon">💭</span>
+                    <span>Chats</span>
+                </a>
+                <a href="#" class="nav-item" data-page="platforms">
+                    <span class="icon">🔗</span>
+                    <span>Platforms</span>
+                </a>
+                <a href="#" class="nav-item" data-page="prompts">
+                    <span class="icon">🤖</span>
+                    <span>AI Prompts</span>
+                </a>
+                <a href="#" class="nav-item" data-page="settings">
+                    <span class="icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="global-ai-status">
+                <label class="toggle-label">
+                    <span>Global AI</span>
+                    <input type="checkbox" id="globalAiToggle" checked>
+                    <span class="toggle-switch"></span>
+                </label>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Chats Page -->
+            <section id="chats-page" class="page active">
+                <div class="chats-container">
+                    <div class="chat-list">
+                        <h2>All Chats</h2>
+                        <div id="chatListContainer"></div>
+                    </div>
+                    
+                    <div class="chat-window" id="chatWindow">
+                        <div class="chat-header">
+                            <div class="chat-info">
+                                <h3 id="chatUserName">Select a chat</h3>
+                                <span id="chatPlatform" class="platform-badge"></span>
+                            </div>
+                            <div class="chat-actions">
+                                <label class="toggle-label">
+                                    <span>AI Replies</span>
+                                    <input type="checkbox" id="chatAiToggle">
+                                    <span class="toggle-switch"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="messages-container" id="messagesContainer">
+                            <!-- Messages will be loaded here -->
+                        </div>
+                        
+                        <div class="message-input-area">
+                            <textarea id="messageInput" placeholder="Type your message..." rows="3"></textarea>
+                            <div class="input-actions">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="enableAiCheckbox" checked>
+                                    <span>Use AI to generate response</span>
+                                </label>
+                                <button id="sendMessageBtn" class="btn btn-primary">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Platforms Page -->
+            <section id="platforms-page" class="page">
+                <h2>Connected Platforms</h2>
+                <p class="page-description">Connect and manage your social media platforms from one place</p>
+                
+                <div class="platforms-grid" id="platformsGrid">
+                    <!-- Platforms will be loaded here -->
+                </div>
+            </section>
+            
+            <!-- AI Prompts Page -->
+            <section id="prompts-page" class="page">
+                <h2>AI Prompt Library</h2>
+                <p class="page-description">Create and test prompts for AI responses</p>
+                
+                <div class="prompts-container">
+                    <div class="add-prompt-form">
+                        <h3>Add New Prompt</h3>
+                        <input type="text" id="promptName" placeholder="Prompt Name">
+                        <textarea id="promptText" placeholder="Enter your prompt template..." rows="4"></textarea>
+                        <button id="addPromptBtn" class="btn btn-primary">Add Prompt</button>
+                    </div>
+                    
+                    <div class="test-ai-section">
+                        <h3>Test AI Response</h3>
+                        <select id="testPromptSelect">
+                            <option value="">Select a prompt...</option>
+                        </select>
+                        <textarea id="testMessage" placeholder="Enter a test message..." rows="3"></textarea>
+                        <button id="testAiBtn" class="btn btn-secondary">Test AI</button>
+                        <div id="testResult" class="test-result"></div>
+                    </div>
+                    
+                    <div class="prompts-list" id="promptsList">
+                        <!-- Prompts will be loaded here -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Settings Page -->
+            <section id="settings-page" class="page">
+                <h2>Settings</h2>
+                <p class="page-description">Configure your API keys and preferences</p>
+                
+                <div class="settings-form">
+                    <div class="form-group">
+                        <label for="apiKeyInput">OpenRouter API Key</label>
+                        <input type="password" id="apiKeyInput" placeholder="Enter your OpenRouter API key">
+                        <small>Get your API key from <a href="https://openrouter.ai" target="_blank">openrouter.ai</a></small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="modelSelect">AI Model</label>
+                        <select id="modelSelect">
+                            <!-- Models will be loaded here -->
+                        </select>
+                    </div>
+                    
+                    <button id="saveSettingsBtn" class="btn btn-primary">Save Settings</button>
+                    
+                    <div id="settingsMessage" class="message"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
