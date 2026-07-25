@@ -1,0 +1,99 @@
+{
+  "settings": {
+    "openRouterApiKey": "",
+    "selectedModel": "openai/gpt-3.5-turbo",
+    "globalAiEnabled": true
+  },
+  "platforms": [],
+  "chats": [
+    {
+      "id": "chat_1",
+      "platform": "facebook",
+      "platformId": "fb_page_123",
+      "customerName": "John Smith",
+      "customerAvatar": "https://ui-avatars.com/api/?name=John+Smith&background=1877F2&color=fff",
+      "lastMessage": "Hi, I need help with my order",
+      "timestamp": "2026-07-25T19:00:20.441Z",
+      "unread": 2,
+      "aiEnabled": true,
+      "messages": [
+        {
+          "id": "msg_1",
+          "sender": "customer",
+          "text": "Hi, I need help with my order",
+          "timestamp": "2026-07-25T18:00:20.441Z"
+        },
+        {
+          "id": "msg_2",
+          "sender": "customer",
+          "text": "Order #12345 hasn't arrived yet",
+          "timestamp": "2026-07-25T18:30:20.441Z"
+        }
+      ]
+    },
+    {
+      "id": "chat_2",
+      "platform": "instagram",
+      "platformId": "ig_account_456",
+      "customerName": "Sarah Johnson",
+      "customerAvatar": "https://ui-avatars.com/api/?name=Sarah+Johnson&background=E4405F&color=fff",
+      "lastMessage": "Love your products! When will you restock?",
+      "timestamp": "2026-07-25T19:00:20.441Z",
+      "unread": 1,
+      "aiEnabled": false,
+      "messages": [
+        {
+          "id": "msg_3",
+          "sender": "customer",
+          "text": "Love your products! When will you restock?",
+          "timestamp": "2026-07-25T17:00:20.441Z"
+        }
+      ]
+    },
+    {
+      "id": "chat_3",
+      "platform": "whatsapp",
+      "platformId": "wa_number_789",
+      "customerName": "Mike Davis",
+      "customerAvatar": "https://ui-avatars.com/api/?name=Mike+Davis&background=25D366&color=fff",
+      "lastMessage": "Can I get a discount for bulk order?",
+      "timestamp": "2026-07-25T19:00:20.441Z",
+      "unread": 0,
+      "aiEnabled": true,
+      "messages": [
+        {
+          "id": "msg_4",
+          "sender": "customer",
+          "text": "Can I get a discount for bulk order?",
+          "timestamp": "2026-07-25T17:30:20.441Z"
+        },
+        {
+          "id": "msg_5",
+          "sender": "agent",
+          "text": "Hi Mike! Yes, we offer bulk discounts. How many units are you looking at?",
+          "timestamp": "2026-07-25T17:35:20.441Z"
+        }
+      ]
+    }
+  ],
+  "prompts": [
+    {
+      "id": "prompt_1",
+      "name": "Friendly Greeting",
+      "content": "You are a friendly customer service representative. Greet the customer warmly and offer assistance.",
+      "isActive": true
+    },
+    {
+      "id": "prompt_2",
+      "name": "Order Inquiry",
+      "content": "You are helping a customer with an order inquiry. Be helpful, provide accurate information, and maintain a professional tone.",
+      "isActive": true
+    },
+    {
+      "id": "prompt_3",
+      "name": "Complaint Handling",
+      "content": "You are handling a customer complaint. Show empathy, apologize sincerely, and offer solutions.",
+      "isActive": false
+    }
+  ]
+}

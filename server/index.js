@@ -1,286 +1,433 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
+const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Data storage (in-memory for demo, use database in production)
-let settings = {
-    openRouterApiKey: '',
-    selectedModel: 'openai/gpt-3.5-turbo',
-    globalAiEnabled: true
-};
+// Data storage (in production, use a database)
+const dataFile = path.join(__dirname, 'data.json');
 
-let platforms = [
-    { id: 1, name: 'Facebook', connected: false, color: '#1877F2' },
-    { id: 2, name: 'Instagram', connected: false, color: '#E4405F' },
-    { id: 3, name: 'WhatsApp', connected: false, color: '#25D366' }
-];
-
-let chats = [
-    {
-        id: 1,
-        platformId: 1,
-        platformName: 'Facebook',
-        userName: 'John Doe',
-        messages: [
-            { id: 1, sender: 'user', text: 'Hello!', timestamp: new Date().toISOString() },
-            { id: 2, sender: 'me', text: 'Hi John! How can I help?', timestamp: new Date().toISOString() }
-        ],
-        aiEnabled: true,
-        lastMessage: 'Hi John! How can I help?',
-        unread: 0
-    },
-    {
-        id: 2,
-        platformId: 2,
-        platformName: 'Instagram',
-        userName: 'Jane Smith',
-        messages: [
-            { id: 1, sender: 'user', text: 'What are your prices?', timestamp: new Date().toISOString() }
-        ],
-        aiEnabled: true,
-        lastMessage: 'What are your prices?',
-        unread: 1
-    },
-    {
-        id: 3,
-        platformId: 3,
-        platformName: 'WhatsApp',
-        userName: 'Bob Wilson',
-        messages: [
-            { id: 1, sender: 'user', text: 'Is this available?', timestamp: new Date().toISOString() }
-        ],
-        aiEnabled: false,
-        lastMessage: 'Is this available?',
-        unread: 1
-    }
-];
-
-let aiPrompts = [
-    { id: 1, name: 'Friendly Greeting', prompt: 'Respond in a friendly and welcoming manner. Be helpful and professional.' },
-    { id: 2, name: 'Sales Inquiry', prompt: 'You are a sales assistant. Provide information about products and services professionally.' },
-    { id: 3, name: 'Support Agent', prompt: 'You are a customer support agent. Solve problems efficiently and empathetically.' }
-];
-
-// Helper function to call OpenRouter API
-async function callOpenRouter(message, conversationHistory, model, apiKey) {
-    if (!apiKey) {
-        throw new Error('OpenRouter API key not configured');
-    }
-
-    const messages = [
-        { role: 'system', content: 'You are a helpful customer service assistant for a business managing multiple social media platforms. Be concise, professional, and helpful.' },
-        ...conversationHistory.map(msg => ({
-            role: msg.sender === 'user' ? 'user' : 'assistant',
-            content: msg.text
-        })),
-        { role: 'user', content: message }
-    ];
-
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-            'HTTP-Referer': 'http://localhost:3000',
-            'X-Title': 'Social Media Chat Manager'
+// Initialize default data
+function initializeData() {
+    const defaultData = {
+        settings: {
+            openRouterApiKey: '',
+            selectedModel: 'openai/gpt-3.5-turbo',
+            globalAiEnabled: true
         },
-        body: JSON.stringify({
-            model: model,
-            messages: messages,
-            max_tokens: 500
-        })
-    });
+        platforms: [],
+        chats: [
+            {
+                id: 'chat_1',
+                platform: 'facebook',
+                platformId: 'fb_page_123',
+                customerName: 'John Smith',
+                customerAvatar: 'https://ui-avatars.com/api/?name=John+Smith&background=1877F2&color=fff',
+                lastMessage: 'Hi, I need help with my order',
+                timestamp: new Date().toISOString(),
+                unread: 2,
+                aiEnabled: true,
+                messages: [
+                    {
+                        id: 'msg_1',
+                        sender: 'customer',
+                        text: 'Hi, I need help with my order',
+                        timestamp: new Date(Date.now() - 3600000).toISOString()
+                    },
+                    {
+                        id: 'msg_2',
+                        sender: 'customer',
+                        text: 'Order #12345 hasn\'t arrived yet',
+                        timestamp: new Date(Date.now() - 1800000).toISOString()
+                    }
+                ]
+            },
+            {
+                id: 'chat_2',
+                platform: 'instagram',
+                platformId: 'ig_account_456',
+                customerName: 'Sarah Johnson',
+                customerAvatar: 'https://ui-avatars.com/api/?name=Sarah+Johnson&background=E4405F&color=fff',
+                lastMessage: 'Love your products! When will you restock?',
+                timestamp: new Date().toISOString(),
+                unread: 1,
+                aiEnabled: false,
+                messages: [
+                    {
+                        id: 'msg_3',
+                        sender: 'customer',
+                        text: 'Love your products! When will you restock?',
+                        timestamp: new Date(Date.now() - 7200000).toISOString()
+                    }
+                ]
+            },
+            {
+                id: 'chat_3',
+                platform: 'whatsapp',
+                platformId: 'wa_number_789',
+                customerName: 'Mike Davis',
+                customerAvatar: 'https://ui-avatars.com/api/?name=Mike+Davis&background=25D366&color=fff',
+                lastMessage: 'Can I get a discount for bulk order?',
+                timestamp: new Date().toISOString(),
+                unread: 0,
+                aiEnabled: true,
+                messages: [
+                    {
+                        id: 'msg_4',
+                        sender: 'customer',
+                        text: 'Can I get a discount for bulk order?',
+                        timestamp: new Date(Date.now() - 5400000).toISOString()
+                    },
+                    {
+                        id: 'msg_5',
+                        sender: 'agent',
+                        text: 'Hi Mike! Yes, we offer bulk discounts. How many units are you looking at?',
+                        timestamp: new Date(Date.now() - 5100000).toISOString()
+                    }
+                ]
+            }
+        ],
+        prompts: [
+            {
+                id: 'prompt_1',
+                name: 'Friendly Greeting',
+                content: 'You are a friendly customer service representative. Greet the customer warmly and offer assistance.',
+                isActive: true
+            },
+            {
+                id: 'prompt_2',
+                name: 'Order Inquiry',
+                content: 'You are helping a customer with an order inquiry. Be helpful, provide accurate information, and maintain a professional tone.',
+                isActive: true
+            },
+            {
+                id: 'prompt_3',
+                name: 'Complaint Handling',
+                content: 'You are handling a customer complaint. Show empathy, apologize sincerely, and offer solutions.',
+                isActive: false
+            }
+        ]
+    };
 
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || 'Failed to get AI response');
+    if (!fs.existsSync(dataFile)) {
+        fs.writeFileSync(dataFile, JSON.stringify(defaultData, null, 2));
+        return defaultData;
     }
+    
+    const data = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+    // Merge with defaults if missing keys
+    if (!data.settings) data.settings = defaultData.settings;
+    if (!data.platforms) data.platforms = defaultData.platforms;
+    if (!data.chats) data.chats = defaultData.chats;
+    if (!data.prompts) data.prompts = defaultData.prompts;
+    
+    return data;
+}
 
-    const data = await response.json();
-    return data.choices[0].message.content;
+let db = initializeData();
+
+// Save data helper
+function saveData() {
+    fs.writeFileSync(dataFile, JSON.stringify(db, null, 2));
 }
 
 // Routes
 
-// Get all settings
+// Get all data
+app.get('/api/data', (req, res) => {
+    res.json(db);
+});
+
+// Settings routes
 app.get('/api/settings', (req, res) => {
-    res.json(settings);
+    res.json(db.settings);
 });
 
-// Update settings
-app.post('/api/settings', (req, res) => {
-    const { openRouterApiKey, selectedModel, globalAiEnabled } = req.body;
-    
-    if (openRouterApiKey !== undefined) settings.openRouterApiKey = openRouterApiKey;
-    if (selectedModel !== undefined) settings.selectedModel = selectedModel;
-    if (globalAiEnabled !== undefined) settings.globalAiEnabled = globalAiEnabled;
-    
-    res.json(settings);
+app.put('/api/settings', (req, res) => {
+    db.settings = { ...db.settings, ...req.body };
+    saveData();
+    res.json(db.settings);
 });
 
-// Get available models (demo - in production, fetch from OpenRouter)
-app.get('/api/models', (req, res) => {
-    const demoModels = [
-        { id: 'openai/gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },
-        { id: 'openai/gpt-4', name: 'GPT-4' },
-        { id: 'anthropic/claude-3-haiku', name: 'Claude 3 Haiku' },
-        { id: 'anthropic/claude-3-sonnet', name: 'Claude 3 Sonnet' },
-        { id: 'google/gemini-pro', name: 'Gemini Pro' },
-        { id: 'meta-llama/llama-3-8b-instruct', name: 'Llama 3 8B' }
-    ];
-    res.json(demoModels);
-});
-
-// Get all platforms
+// Platforms routes
 app.get('/api/platforms', (req, res) => {
-    res.json(platforms);
+    res.json(db.platforms);
 });
 
-// Connect/disconnect platform (demo)
-app.post('/api/platforms/:id/toggle', (req, res) => {
-    const platform = platforms.find(p => p.id === parseInt(req.params.id));
-    if (platform) {
-        platform.connected = !platform.connected;
-        res.json(platform);
-    } else {
-        res.status(404).json({ error: 'Platform not found' });
-    }
+app.post('/api/platforms/connect', async (req, res) => {
+    const { platform, accessToken, pageId, pageName } = req.body;
+    
+    // In production, validate the token with the respective API
+    const newPlatform = {
+        id: `platform_${uuidv4()}`,
+        platform,
+        pageId,
+        pageName,
+        accessToken,
+        connectedAt: new Date().toISOString(),
+        status: 'active'
+    };
+    
+    db.platforms.push(newPlatform);
+    saveData();
+    res.json({ success: true, platform: newPlatform });
 });
 
-// Get all chats
+app.delete('/api/platforms/:id', (req, res) => {
+    db.platforms = db.platforms.filter(p => p.id !== req.params.id);
+    saveData();
+    res.json({ success: true });
+});
+
+// Chats routes
 app.get('/api/chats', (req, res) => {
+    const { platform, filter } = req.query;
+    let chats = [...db.chats];
+    
+    if (platform) {
+        chats = chats.filter(c => c.platform === platform);
+    }
+    
+    if (filter === 'unread') {
+        chats = chats.filter(c => c.unread > 0);
+    }
+    
     res.json(chats);
 });
 
-// Get single chat
 app.get('/api/chats/:id', (req, res) => {
-    const chat = chats.find(c => c.id === parseInt(req.params.id));
-    if (chat) {
-        chat.unread = 0; // Mark as read
-        res.json(chat);
-    } else {
-        res.status(404).json({ error: 'Chat not found' });
+    const chat = db.chats.find(c => c.id === req.params.id);
+    if (!chat) {
+        return res.status(404).json({ error: 'Chat not found' });
     }
+    res.json(chat);
 });
 
-// Send message
-app.post('/api/chats/:id/messages', async (req, res) => {
-    const chat = chats.find(c => c.id === parseInt(req.params.id));
-    const { text, enableAi } = req.body;
+app.post('/api/chats', (req, res) => {
+    const { platform, platformId, customerName, customerAvatar } = req.body;
+    
+    const newChat = {
+        id: `chat_${uuidv4()}`,
+        platform,
+        platformId,
+        customerName,
+        customerAvatar: customerAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(customerName)}&background=random`,
+        lastMessage: '',
+        timestamp: new Date().toISOString(),
+        unread: 0,
+        aiEnabled: db.settings.globalAiEnabled,
+        messages: []
+    };
+    
+    db.chats.unshift(newChat);
+    saveData();
+    res.json(newChat);
+});
+
+app.put('/api/chats/:id', (req, res) => {
+    const chatIndex = db.chats.findIndex(c => c.id === req.params.id);
+    if (chatIndex === -1) {
+        return res.status(404).json({ error: 'Chat not found' });
+    }
+    
+    db.chats[chatIndex] = { ...db.chats[chatIndex], ...req.body };
+    saveData();
+    res.json(db.chats[chatIndex]);
+});
+
+app.post('/api/chats/:id/messages', (req, res) => {
+    const { text, sender } = req.body;
+    const chat = db.chats.find(c => c.id === req.params.id);
     
     if (!chat) {
         return res.status(404).json({ error: 'Chat not found' });
     }
     
-    // Add user message
-    const userMessage = {
-        id: chat.messages.length + 1,
-        sender: 'me',
-        text: text,
+    const newMessage = {
+        id: `msg_${uuidv4()}`,
+        sender: sender || 'agent',
+        text,
         timestamp: new Date().toISOString()
     };
-    chat.messages.push(userMessage);
+    
+    chat.messages.push(newMessage);
     chat.lastMessage = text;
+    chat.timestamp = new Date().toISOString();
     
-    // Check if AI should respond
-    const shouldUseAi = enableAi && settings.globalAiEnabled && chat.aiEnabled;
-    
-    if (shouldUseAi && settings.openRouterApiKey) {
-        try {
-            // Get conversation history (last 10 messages for context)
-            const history = chat.messages.slice(-10);
-            
-            const aiResponse = await callOpenRouter(
-                text,
-                history,
-                settings.selectedModel,
-                settings.openRouterApiKey
-            );
-            
-            const aiMessage = {
-                id: chat.messages.length + 1,
-                sender: 'me',
-                text: aiResponse,
-                timestamp: new Date().toISOString(),
-                isAi: true
-            };
-            chat.messages.push(aiMessage);
-            chat.lastMessage = aiResponse;
-            
-            res.json({ chat, aiUsed: true });
-            return;
-        } catch (error) {
-            console.error('AI Error:', error.message);
-            res.json({ chat, aiUsed: false, aiError: error.message });
-            return;
-        }
+    if (sender === 'customer') {
+        chat.unread++;
     }
     
-    res.json({ chat, aiUsed: false });
+    saveData();
+    res.json({ message: newMessage, chat });
 });
 
-// Toggle AI for specific chat
-app.patch('/api/chats/:id/ai', (req, res) => {
-    const chat = chats.find(c => c.id === parseInt(req.params.id));
-    if (chat) {
-        chat.aiEnabled = req.body.aiEnabled;
-        res.json(chat);
-    } else {
-        res.status(404).json({ error: 'Chat not found' });
+app.put('/api/chats/:id/ai-toggle', (req, res) => {
+    const { aiEnabled } = req.body;
+    const chat = db.chats.find(c => c.id === req.params.id);
+    
+    if (!chat) {
+        return res.status(404).json({ error: 'Chat not found' });
     }
+    
+    chat.aiEnabled = aiEnabled;
+    saveData();
+    res.json({ success: true, aiEnabled: chat.aiEnabled });
 });
 
-// Get AI prompts
+// Prompts routes
 app.get('/api/prompts', (req, res) => {
-    res.json(aiPrompts);
+    res.json(db.prompts);
 });
 
-// Add new prompt
 app.post('/api/prompts', (req, res) => {
-    const { name, prompt } = req.body;
+    const { name, content } = req.body;
+    
     const newPrompt = {
-        id: aiPrompts.length + 1,
+        id: `prompt_${uuidv4()}`,
         name,
-        prompt
+        content,
+        isActive: true
     };
-    aiPrompts.push(newPrompt);
+    
+    db.prompts.push(newPrompt);
+    saveData();
     res.json(newPrompt);
 });
 
-// Test AI with prompt
-app.post('/api/ai/test', async (req, res) => {
-    const { message, prompt } = req.body;
+app.put('/api/prompts/:id', (req, res) => {
+    const prompt = db.prompts.find(p => p.id === req.params.id);
+    if (!prompt) {
+        return res.status(404).json({ error: 'Prompt not found' });
+    }
     
-    if (!settings.openRouterApiKey) {
-        return res.status(400).json({ error: 'OpenRouter API key not configured' });
+    Object.assign(prompt, req.body);
+    saveData();
+    res.json(prompt);
+});
+
+app.delete('/api/prompts/:id', (req, res) => {
+    db.prompts = db.prompts.filter(p => p.id !== req.params.id);
+    saveData();
+    res.json({ success: true });
+});
+
+// AI routes
+app.get('/api/ai/models', async (req, res) => {
+    const { openRouterApiKey } = db.settings;
+    
+    if (!openRouterApiKey) {
+        return res.json({ models: [] });
     }
     
     try {
-        const fullMessage = prompt ? `${prompt}\n\nUser message: ${message}` : message;
-        const response = await callOpenRouter(
-            fullMessage,
-            [],
-            settings.selectedModel,
-            settings.openRouterApiKey
-        );
-        
-        res.json({ response, success: true });
+        const response = await axios.get('https://openrouter.ai/api/v1/models', {
+            headers: {
+                'Authorization': `Bearer ${openRouterApiKey}`
+            }
+        });
+        res.json({ models: response.data.data || [] });
     } catch (error) {
-        res.status(500).json({ error: error.message, success: false });
+        console.error('Error fetching models:', error.message);
+        res.status(500).json({ error: 'Failed to fetch models' });
     }
 });
 
+app.post('/api/ai/generate', async (req, res) => {
+    const { message, chatId, customPrompt } = req.body;
+    const { openRouterApiKey, selectedModel, globalAiEnabled } = db.settings;
+    
+    if (!globalAiEnabled) {
+        return res.status(400).json({ error: 'Global AI is disabled' });
+    }
+    
+    const chat = db.chats.find(c => c.id === chatId);
+    if (!chat || !chat.aiEnabled) {
+        return res.status(400).json({ error: 'AI is disabled for this chat' });
+    }
+    
+    if (!openRouterApiKey) {
+        return res.status(400).json({ error: 'OpenRouter API key not configured' });
+    }
+    
+    // Build conversation context
+    const conversationHistory = chat.messages.slice(-10).map(msg => ({
+        role: msg.sender === 'customer' ? 'user' : 'assistant',
+        content: msg.text
+    }));
+    
+    // Add system prompt
+    let systemContent = 'You are a helpful customer service representative managing social media conversations. Be professional, friendly, and concise.';
+    
+    if (customPrompt) {
+        systemContent = customPrompt;
+    } else {
+        const activePrompts = db.prompts.filter(p => p.isActive);
+        if (activePrompts.length > 0) {
+            systemContent = activePrompts.map(p => p.content).join('\n\n');
+        }
+    }
+    
+    const messages = [
+        { role: 'system', content: systemContent },
+        ...conversationHistory,
+        { role: 'user', content: message }
+    ];
+    
+    try {
+        const response = await axios.post(
+            'https://openrouter.ai/api/v1/chat/completions',
+            {
+                model: selectedModel || 'openai/gpt-3.5-turbo',
+                messages,
+                max_tokens: 500,
+                temperature: 0.7
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${openRouterApiKey}`,
+                    'Content-Type': 'application/json',
+                    'HTTP-Referer': 'http://localhost:3000',
+                    'X-Title': 'Social Chat Hub'
+                }
+            }
+        );
+        
+        const aiResponse = response.data.choices[0]?.message?.content || 'Sorry, I couldn\'t generate a response.';
+        
+        res.json({ 
+            response: aiResponse,
+            model: selectedModel,
+            usage: response.data.usage
+        });
+    } catch (error) {
+        console.error('AI generation error:', error.response?.data || error.message);
+        res.status(500).json({ 
+            error: 'Failed to generate AI response',
+            details: error.response?.data?.error?.message || error.message
+        });
+    }
+});
+
+// Serve index.html for all other routes (SPA support)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+// Start server
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Social Chat Hub running on http://localhost:${PORT}`);
+    console.log(`📊 Data stored in: ${dataFile}`);
 });

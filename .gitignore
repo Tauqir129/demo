@@ -2,28 +2,26 @@
 # Dependencies
 node_modules/
 
-# Logs
-*.log
-server.log
-
-# Environment variables
+# Environment
 .env
 .env.local
 .env.*
 
-# Package manager
-package-lock.json
+# Logs
+*.log
 
-# IDE
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Build outputs
+# Build artifacts
 dist/
 build/
 target/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+.env
 ```
