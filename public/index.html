@@ -2,99 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#4F46E5">
-    <meta name="description" content="Unified social media chat management with AI assistance">
-    <title>ChatHub Pro - Unified Social Media Manager</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Chat Hub - Unified Social Media Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay hidden">
-        <div class="spinner"></div>
-        <p>Loading...</p>
-    </div>
-
-    <!-- Toast Notifications -->
-    <div id="toastContainer" class="toast-container"></div>
-
-    <!-- Modal Container -->
-    <div id="modalContainer" class="modal-container hidden"></div>
-
     <div class="app-container">
-        <!-- Mobile Header -->
-        <header class="mobile-header">
-            <button id="menuToggle" class="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="logo">
-                <i class="fas fa-comments"></i>
-                <h1>ChatHub Pro</h1>
-            </div>
-            <button id="mobileSettings" class="icon-btn">
-                <i class="fas fa-cog"></i>
-            </button>
-        </header>
-
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
                     <i class="fas fa-comments"></i>
-                    <h1>ChatHub Pro</h1>
+                    <span>Social Chat Hub</span>
                 </div>
-                <button id="closeSidebar" class="close-sidebar">
-                    <i class="fas fa-times"></i>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
                 </button>
             </div>
-            
-            <nav class="nav-menu">
-                <a href="#" class="nav-item active" data-page="chats">
-                    <span class="icon"><i class="fas fa-comments"></i></span>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="inbox">
+                    <i class="fas fa-inbox"></i>
                     <span>Inbox</span>
-                    <span class="badge" id="inboxBadge">0</span>
+                    <span class="badge" id="unreadBadge">0</span>
                 </a>
                 <a href="#" class="nav-item" data-page="platforms">
-                    <span class="icon"><i class="fas fa-plug"></i></span>
-                    <span>Connections</span>
+                    <i class="fas fa-share-alt"></i>
+                    <span>Platforms</span>
                 </a>
-                <a href="#" class="nav-item" data-page="prompts">
-                    <span class="icon"><i class="fas fa-robot"></i></span>
+                <a href="#" class="nav-item" data-page="ai-studio">
+                    <i class="fas fa-robot"></i>
                     <span>AI Studio</span>
                 </a>
                 <a href="#" class="nav-item" data-page="analytics">
-                    <span class="icon"><i class="fas fa-chart-line"></i></span>
+                    <i class="fas fa-chart-line"></i>
                     <span>Analytics</span>
                 </a>
                 <a href="#" class="nav-item" data-page="settings">
-                    <span class="icon"><i class="fas fa-cog"></i></span>
+                    <i class="fas fa-cog"></i>
                     <span>Settings</span>
                 </a>
             </nav>
-            
+
             <div class="sidebar-footer">
-                <div class="ai-status-card">
-                    <div class="ai-status-header">
-                        <span><i class="fas fa-brain"></i> Global AI</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="globalAiToggle" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <p class="ai-status-text">AI auto-replies when enabled</p>
+                <div class="global-ai-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="globalAiToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">Global AI</span>
                 </div>
-                
                 <div class="user-profile">
-                    <div class="avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" alt="User">
                     <div class="user-info">
-                        <span class="username">Demo User</span>
-                        <span class="status"><i class="fas fa-circle"></i> Online</span>
+                        <span class="user-name">Admin User</span>
+                        <span class="user-status">Online</span>
                     </div>
                 </div>
             </div>
@@ -102,269 +65,247 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Chats Page -->
-            <section id="chats-page" class="page active">
-                <div class="page-header">
-                    <div>
-                        <h2><i class="fas fa-inbox"></i> Message Inbox</h2>
-                        <p class="page-subtitle">Manage all your conversations in one place</p>
-                    </div>
-                    <div class="header-actions">
-                        <button class="icon-btn" id="refreshChats" title="Refresh">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                        <button class="icon-btn" id="markAllRead" title="Mark all as read">
-                            <i class="fas fa-envelope-open"></i>
-                        </button>
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="chatSearch" placeholder="Search conversations...">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="chats-layout">
-                    <!-- Chat List Panel -->
+            <!-- Inbox Page -->
+            <div class="page active" id="inboxPage">
+                <div class="inbox-container">
+                    <!-- Chat List -->
                     <div class="chat-list-panel">
                         <div class="chat-list-header">
-                            <h3>Conversations</h3>
-                            <div class="filter-buttons">
+                            <h2>Conversations</h2>
+                            <div class="chat-filters">
                                 <button class="filter-btn active" data-filter="all">All</button>
                                 <button class="filter-btn" data-filter="unread">Unread</button>
-                                <button class="filter-btn" data-filter="facebook"><i class="fab fa-facebook"></i></button>
-                                <button class="filter-btn" data-filter="instagram"><i class="fab fa-instagram"></i></button>
-                                <button class="filter-btn" data-filter="whatsapp"><i class="fab fa-whatsapp"></i></button>
+                                <div class="platform-filter">
+                                    <select id="platformFilter">
+                                        <option value="">All Platforms</option>
+                                        <option value="facebook">Facebook</option>
+                                        <option value="instagram">Instagram</option>
+                                        <option value="whatsapp">WhatsApp</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div id="chatListContainer" class="chat-list-scroll">
-                            <div class="empty-state">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p>Loading conversations...</p>
-                            </div>
+                        <div class="chat-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search conversations..." id="chatSearch">
+                        </div>
+                        <div class="chat-list" id="chatList">
+                            <!-- Chats will be loaded here -->
                         </div>
                     </div>
 
-                    <!-- Chat Window Panel -->
+                    <!-- Chat Window -->
                     <div class="chat-window-panel" id="chatWindowPanel">
-                        <div class="empty-chat-state" id="emptyChatState">
-                            <div class="empty-icon">
-                                <i class="fas fa-comments"></i>
-                            </div>
+                        <div class="empty-state" id="emptyState">
+                            <i class="fas fa-comments"></i>
                             <h3>Select a conversation</h3>
                             <p>Choose a chat from the list to start messaging</p>
                         </div>
 
-                        <div class="chat-interface hidden" id="chatInterface">
+                        <div class="chat-window" id="chatWindow" style="display: none;">
+                            <!-- Chat Header -->
                             <div class="chat-header">
-                                <div class="chat-user-info">
-                                    <button class="back-btn mobile-only" id="backToChatList">
-                                        <i class="fas fa-arrow-left"></i>
-                                    </button>
-                                    <div class="avatar-wrapper">
-                                        <div class="avatar large" id="chatAvatar">
-                                            <i class="fas fa-user"></i>
-                                        </div>
-                                        <span class="online-indicator" id="onlineIndicator"></span>
-                                    </div>
+                                <div class="chat-info">
+                                    <img src="" alt="" id="chatAvatar">
                                     <div class="chat-details">
-                                        <h3 id="chatUserName">User Name</h3>
+                                        <h3 id="chatCustomerName"></h3>
                                         <div class="chat-meta">
-                                            <span class="platform-badge" id="chatPlatform">
-                                                <i class="fab fa-facebook"></i> Facebook
+                                            <span class="platform-badge" id="chatPlatformBadge">
+                                                <i class="fab fa-facebook"></i>
                                             </span>
-                                            <span class="last-seen" id="lastSeen">Active now</span>
+                                            <span id="chatStatus">Active</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="chat-actions-bar">
-                                    <div class="ai-toggle-wrapper">
-                                        <span class="ai-label">AI Auto-reply</span>
-                                        <label class="toggle-switch">
+                                <div class="chat-actions">
+                                    <div class="ai-toggle-container">
+                                        <label class="switch small">
                                             <input type="checkbox" id="chatAiToggle">
                                             <span class="slider"></span>
                                         </label>
+                                        <span class="toggle-label">AI Auto-reply</span>
                                     </div>
-                                    <button class="icon-btn" id="chatInfo" title="Chat info">
-                                        <i class="fas fa-info-circle"></i>
-                                    </button>
-                                    <button class="icon-btn" id="chatOptions" title="More options">
+                                    <button class="btn-icon" title="More options">
                                         <i class="fas fa-ellipsis-v"></i>
                                     </button>
                                 </div>
                             </div>
 
+                            <!-- Messages Area -->
                             <div class="messages-container" id="messagesContainer">
-                                <!-- Messages loaded dynamically -->
-                            </div>
-
-                            <div class="typing-indicator hidden" id="typingIndicator">
-                                <div class="typing-dots">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
+                                <div class="messages" id="messagesList">
+                                    <!-- Messages will be loaded here -->
                                 </div>
-                                <span>AI is composing a response...</span>
                             </div>
 
-                            <div class="message-input-area">
+                            <!-- Quick Replies -->
+                            <div class="quick-replies" id="quickReplies">
+                                <span class="quick-replies-label">Quick replies:</span>
+                                <button class="quick-reply-btn" data-text="Thank you for reaching out! How can I help you today?">
+                                    <i class="fas fa-bolt"></i> Greeting
+                                </button>
+                                <button class="quick-reply-btn" data-text="Let me check that for you. One moment please!">
+                                    <i class="fas fa-bolt"></i> Checking
+                                </button>
+                                <button class="quick-reply-btn" data-text="Is there anything else I can help you with?">
+                                    <i class="fas fa-bolt"></i> Follow-up
+                                </button>
+                            </div>
+
+                            <!-- Input Area -->
+                            <div class="chat-input-area">
                                 <div class="input-toolbar">
                                     <button class="toolbar-btn" title="Attach file">
                                         <i class="fas fa-paperclip"></i>
                                     </button>
-                                    <button class="toolbar-btn" title="Insert emoji">
+                                    <button class="toolbar-btn" title="Add emoji">
                                         <i class="fas fa-smile"></i>
                                     </button>
-                                    <button class="toolbar-btn" title="Use template">
-                                        <i class="fas fa-file-alt"></i>
+                                    <button class="toolbar-btn" title="Send GIF">
+                                        <i class="fas fa-photo-video"></i>
                                     </button>
-                                    <div class="quick-replies" id="quickReplies">
-                                        <!-- Quick reply buttons -->
-                                    </div>
+                                    <button class="toolbar-btn ai-generate-btn" id="aiGenerateBtn" title="Generate AI response">
+                                        <i class="fas fa-magic"></i>
+                                        <span>AI Reply</span>
+                                    </button>
                                 </div>
                                 <div class="input-wrapper">
-                                    <textarea id="messageInput" placeholder="Type your message..." rows="1"></textarea>
-                                    <div class="input-actions">
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" id="enableAiCheckbox" checked>
-                                            <span><i class="fas fa-magic"></i> AI Assist</span>
-                                        </label>
-                                        <button id="sendMessageBtn" class="send-btn">
-                                            <i class="fas fa-paper-plane"></i>
-                                        </button>
-                                    </div>
+                                    <textarea 
+                                        id="messageInput" 
+                                        placeholder="Type your message..." 
+                                        rows="1"
+                                    ></textarea>
+                                    <button class="send-btn" id="sendBtn">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
-            
-            <!-- Platforms Page -->
-            <section id="platforms-page" class="page">
-                <div class="page-header">
-                    <div>
-                        <h2><i class="fas fa-plug"></i> Platform Connections</h2>
-                        <p class="page-subtitle">Connect your social media accounts to centralize messaging</p>
-                    </div>
-                </div>
+            </div>
 
-                <div class="connection-guide">
-                    <div class="guide-card">
-                        <h3><i class="fas fa-info-circle"></i> How to Connect Platforms</h3>
-                        <div class="steps">
-                            <div class="step">
-                                <span class="step-number">1</span>
-                                <p>Click "Connect" on your desired platform</p>
-                            </div>
-                            <div class="step">
-                                <span class="step-number">2</span>
-                                <p>You'll be redirected to Meta's OAuth page</p>
-                            </div>
-                            <div class="step">
-                                <span class="step-number">3</span>
-                                <p>Grant permissions for pages, Instagram, and WhatsApp</p>
-                            </div>
-                            <div class="step">
-                                <span class="step-number">4</span>
-                                <p>Return here - your platforms will be connected!</p>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Platforms Page -->
+            <div class="page" id="platformsPage">
+                <div class="page-header">
+                    <h1><i class="fas fa-share-alt"></i> Connected Platforms</h1>
+                    <p>Manage your social media platform connections</p>
                 </div>
 
                 <div class="platforms-grid" id="platformsGrid">
-                    <!-- Platforms loaded dynamically -->
-                </div>
+                    <!-- Facebook Card -->
+                    <div class="platform-card" data-platform="facebook">
+                        <div class="platform-icon facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </div>
+                        <h3>Facebook Pages</h3>
+                        <p>Connect your Facebook business pages to manage messages and comments</p>
+                        <div class="platform-status" id="facebookStatus">
+                            <span class="status-indicator disconnected"></span>
+                            <span class="status-text">Not Connected</span>
+                        </div>
+                        <button class="btn btn-primary connect-btn" onclick="showConnectModal('facebook')">
+                            <i class="fas fa-link"></i> Connect
+                        </button>
+                    </div>
 
-                <div class="oauth-info">
-                    <h4><i class="fas fa-shield-alt"></i> OAuth Security</h4>
-                    <p>All connections use official Meta OAuth 2.0 flow. We never store your passwords. Access tokens are encrypted and can be revoked anytime from your Facebook settings.</p>
-                    <a href="https://developers.facebook.com/docs/meta-business-suite-api" target="_blank" class="link">
-                        <i class="fas fa-external-link-alt"></i> Learn more about Meta APIs
-                    </a>
-                </div>
-            </section>
-            
-            <!-- AI Prompts Page -->
-            <section id="prompts-page" class="page">
-                <div class="page-header">
-                    <div>
-                        <h2><i class="fas fa-robot"></i> AI Studio</h2>
-                        <p class="page-subtitle">Create custom prompts and test AI responses</p>
+                    <!-- Instagram Card -->
+                    <div class="platform-card" data-platform="instagram">
+                        <div class="platform-icon instagram">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                        <h3>Instagram Business</h3>
+                        <p>Link your Instagram business account to handle DMs and comments</p>
+                        <div class="platform-status" id="instagramStatus">
+                            <span class="status-indicator disconnected"></span>
+                            <span class="status-text">Not Connected</span>
+                        </div>
+                        <button class="btn btn-primary connect-btn" onclick="showConnectModal('instagram')">
+                            <i class="fas fa-link"></i> Connect
+                        </button>
+                    </div>
+
+                    <!-- WhatsApp Card -->
+                    <div class="platform-card" data-platform="whatsapp">
+                        <div class="platform-icon whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <h3>WhatsApp Business</h3>
+                        <p>Connect WhatsApp Business API for customer messaging</p>
+                        <div class="platform-status" id="whatsappStatus">
+                            <span class="status-indicator disconnected"></span>
+                            <span class="status-text">Not Connected</span>
+                        </div>
+                        <button class="btn btn-primary connect-btn" onclick="showConnectModal('whatsapp')">
+                            <i class="fas fa-link"></i> Connect
+                        </button>
                     </div>
                 </div>
 
-                <div class="prompts-layout">
-                    <div class="prompt-builder">
-                        <div class="card">
-                            <h3><i class="fas fa-plus-circle"></i> Create New Prompt</h3>
-                            <div class="form-group">
-                                <label for="promptName">Prompt Name</label>
-                                <input type="text" id="promptName" placeholder="e.g., Friendly Sales Response">
-                            </div>
-                            <div class="form-group">
-                                <label for="promptText">Prompt Template</label>
-                                <textarea id="promptText" placeholder="Enter your prompt template... Use {message} as placeholder for user message" rows="5"></textarea>
-                                <small>Tip: Include tone instructions and context about your business</small>
-                            </div>
-                            <button id="addPromptBtn" class="btn btn-primary btn-block">
-                                <i class="fas fa-save"></i> Save Prompt
+                <div class="connected-platforms" id="connectedPlatformsList">
+                    <h2><i class="fas fa-check-circle"></i> Connected Accounts</h2>
+                    <div class="accounts-list" id="accountsList">
+                        <!-- Connected accounts will be listed here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Studio Page -->
+            <div class="page" id="aiStudioPage">
+                <div class="page-header">
+                    <h1><i class="fas fa-robot"></i> AI Studio</h1>
+                    <p>Create and manage AI prompts for automated responses</p>
+                </div>
+
+                <div class="ai-studio-container">
+                    <!-- Prompts List -->
+                    <div class="prompts-section">
+                        <div class="section-header">
+                            <h2>Saved Prompts</h2>
+                            <button class="btn btn-primary" onclick="showPromptModal()">
+                                <i class="fas fa-plus"></i> New Prompt
                             </button>
                         </div>
+                        <div class="prompts-list" id="promptsList">
+                            <!-- Prompts will be loaded here -->
+                        </div>
+                    </div>
 
-                        <div class="card mt-4">
-                            <h3><i class="fas fa-flask"></i> Test AI Response</h3>
+                    <!-- AI Test Panel -->
+                    <div class="ai-test-section">
+                        <h2>Test AI Response</h2>
+                        <div class="test-form">
                             <div class="form-group">
-                                <label for="testPromptSelect">Select Prompt</label>
+                                <label>Sample Customer Message</label>
+                                <textarea id="testMessage" placeholder="Enter a test message..." rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Prompt (Optional)</label>
                                 <select id="testPromptSelect">
-                                    <option value="">-- Select a prompt --</option>
+                                    <option value="">Use Default System Prompt</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label for="testMessage">Test Message</label>
-                                <textarea id="testMessage" placeholder="Enter a sample customer message..." rows="3"></textarea>
-                            </div>
-                            <button id="testAiBtn" class="btn btn-secondary btn-block">
-                                <i class="fas fa-play"></i> Test AI
+                            <button class="btn btn-primary" id="testAiBtn">
+                                <i class="fas fa-flask"></i> Test Response
                             </button>
-                            
-                            <div id="testResult" class="test-result hidden">
-                                <div class="result-header">
-                                    <span><i class="fas fa-robot"></i> AI Response</span>
-                                    <span id="testTiming"></span>
-                                </div>
-                                <div id="testResponse" class="result-content"></div>
-                            </div>
                         </div>
-                    </div>
-
-                    <div class="prompts-library">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3><i class="fas fa-book"></i> Saved Prompts Library</h3>
-                                <span class="badge" id="promptsCount">0</span>
-                            </div>
-                            <div id="promptsList" class="prompts-scroll">
-                                <div class="empty-state">
-                                    <i class="fas fa-inbox"></i>
-                                    <p>No prompts yet. Create your first prompt!</p>
-                                </div>
-                            </div>
+                        <div class="test-result" id="testResult" style="display: none;">
+                            <h3>AI Response:</h3>
+                            <div class="response-content" id="responseContent"></div>
+                            <div class="response-meta" id="responseMeta"></div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- Analytics Page (New) -->
-            <section id="analytics-page" class="page">
+            <!-- Analytics Page -->
+            <div class="page" id="analyticsPage">
                 <div class="page-header">
-                    <div>
-                        <h2><i class="fas fa-chart-line"></i> Analytics Dashboard</h2>
-                        <p class="page-subtitle">Track your performance across all platforms</p>
-                    </div>
+                    <h1><i class="fas fa-chart-line"></i> Analytics Dashboard</h1>
+                    <p>Track your performance across all platforms</p>
                 </div>
 
-                <div class="analytics-grid">
+                <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon blue">
                             <i class="fas fa-comments"></i>
@@ -376,11 +317,11 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon green">
-                            <i class="fas fa-check-circle"></i>
+                            <i class="fas fa-envelope-open"></i>
                         </div>
                         <div class="stat-details">
-                            <h3 id="aiResponses">0</h3>
-                            <p>AI Responses</p>
+                            <h3 id="resolvedToday">0</h3>
+                            <p>Resolved Today</p>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -394,187 +335,266 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon orange">
-                            <i class="fas fa-users"></i>
+                            <i class="fas fa-robot"></i>
                         </div>
                         <div class="stat-details">
-                            <h3 id="unreadMessages">0</h3>
-                            <p>Unread Messages</p>
+                            <h3 id="aiResponses">0</h3>
+                            <p>AI Responses</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="analytics-charts">
-                    <div class="card">
+                    <div class="chart-card">
                         <h3>Messages by Platform</h3>
-                        <div id="platformChart" class="chart-container">
-                            <div class="platform-bar">
-                                <span>Facebook</span>
-                                <div class="bar">
-                                    <div class="bar-fill facebook" style="width: 0%"></div>
+                        <div class="chart-placeholder" id="platformChart">
+                            <div class="bar-chart">
+                                <div class="bar-item">
+                                    <div class="bar-label">Facebook</div>
+                                    <div class="bar-container">
+                                        <div class="bar facebook-bar" style="width: 45%"></div>
+                                    </div>
+                                    <div class="bar-value">45%</div>
                                 </div>
-                                <span id="facebookCount">0</span>
-                            </div>
-                            <div class="platform-bar">
-                                <span>Instagram</span>
-                                <div class="bar">
-                                    <div class="bar-fill instagram" style="width: 0%"></div>
+                                <div class="bar-item">
+                                    <div class="bar-label">Instagram</div>
+                                    <div class="bar-container">
+                                        <div class="bar instagram-bar" style="width: 35%"></div>
+                                    </div>
+                                    <div class="bar-value">35%</div>
                                 </div>
-                                <span id="instagramCount">0</span>
-                            </div>
-                            <div class="platform-bar">
-                                <span>WhatsApp</span>
-                                <div class="bar">
-                                    <div class="bar-fill whatsapp" style="width: 0%"></div>
+                                <div class="bar-item">
+                                    <div class="bar-label">WhatsApp</div>
+                                    <div class="bar-container">
+                                        <div class="bar whatsapp-bar" style="width: 20%"></div>
+                                    </div>
+                                    <div class="bar-value">20%</div>
                                 </div>
-                                <span id="whatsappCount">0</span>
                             </div>
                         </div>
                     </div>
-
-                    <div class="card">
-                        <h3>AI Usage Statistics</h3>
-                        <div class="ai-stats">
-                            <div class="ai-stat-item">
-                                <label>Global AI Status</label>
-                                <span id="globalAiStatus" class="status-badge connected">Enabled</span>
+                    <div class="chart-card">
+                        <h3>Response Performance</h3>
+                        <div class="performance-stats">
+                            <div class="perf-item">
+                                <span class="perf-label">First Response Time</span>
+                                <span class="perf-value good">&lt; 5 min</span>
                             </div>
-                            <div class="ai-stat-item">
-                                <label>Active Model</label>
-                                <span id="activeModel">-</span>
+                            <div class="perf-item">
+                                <span class="perf-label">Resolution Rate</span>
+                                <span class="perf-value good">92%</span>
                             </div>
-                            <div class="ai-stat-item">
-                                <label>Chats with AI Enabled</label>
-                                <span id="chatsWithAi">0/0</span>
+                            <div class="perf-item">
+                                <span class="perf-label">Customer Satisfaction</span>
+                                <span class="perf-value good">4.8/5</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
-            
+            </div>
+
             <!-- Settings Page -->
-            <section id="settings-page" class="page">
+            <div class="page" id="settingsPage">
                 <div class="page-header">
-                    <div>
-                        <h2><i class="fas fa-cog"></i> Settings</h2>
-                        <p class="page-subtitle">Configure API keys and preferences</p>
-                    </div>
+                    <h1><i class="fas fa-cog"></i> Settings</h1>
+                    <p>Configure your application preferences</p>
                 </div>
 
-                <div class="settings-layout">
-                    <div class="settings-panel">
-                        <div class="card">
-                            <h3><i class="fas fa-key"></i> API Configuration</h3>
-                            <div class="form-group">
-                                <label for="apiKeyInput">OpenRouter API Key</label>
-                                <div class="input-with-action">
-                                    <input type="password" id="apiKeyInput" placeholder="sk-or-...">
-                                    <button class="btn-icon" id="toggleApiKey" title="Show/Hide">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                <small>Get your API key from <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai</a></small>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="modelSelect">AI Model</label>
-                                <select id="modelSelect">
-                                    <option value="">Loading models...</option>
-                                </select>
-                                <small>Choose the AI model for generating responses</small>
-                            </div>
-
-                            <div class="form-actions">
-                                <button id="saveSettingsBtn" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Save Configuration
-                                </button>
-                                <button id="testConnectionBtn" class="btn btn-secondary">
-                                    <i class="fas fa-wifi"></i> Test Connection
+                <div class="settings-container">
+                    <!-- API Configuration -->
+                    <div class="settings-section">
+                        <h2><i class="fas fa-key"></i> API Configuration</h2>
+                        <div class="form-group">
+                            <label for="openRouterApiKey">OpenRouter API Key</label>
+                            <div class="input-with-action">
+                                <input 
+                                    type="password" 
+                                    id="openRouterApiKey" 
+                                    placeholder="Enter your OpenRouter API key"
+                                >
+                                <button class="btn btn-secondary" onclick="toggleApiKeyVisibility()">
+                                    <i class="fas fa-eye"></i>
                                 </button>
                             </div>
-                            
-                            <div id="settingsMessage" class="message hidden"></div>
+                            <p class="help-text">
+                                Get your API key from <a href="https://openrouter.ai" target="_blank">openrouter.ai</a>
+                            </p>
                         </div>
+                        <div class="form-group">
+                            <label for="modelSelect">AI Model</label>
+                            <select id="modelSelect">
+                                <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                <option value="openai/gpt-4">GPT-4</option>
+                                <option value="openai/gpt-4-turbo">GPT-4 Turbo</option>
+                                <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
+                                <option value="anthropic/claude-3-sonnet">Claude 3 Sonnet</option>
+                                <option value="anthropic/claude-3-opus">Claude 3 Opus</option>
+                                <option value="google/gemini-pro">Gemini Pro</option>
+                                <option value="meta-llama/llama-3-70b-instruct">Llama 3 70B</option>
+                                <option value="mistralai/mistral-large">Mistral Large</option>
+                            </select>
+                            <button class="btn btn-secondary" id="refreshModelsBtn">
+                                <i class="fas fa-sync"></i> Refresh Models
+                            </button>
+                        </div>
+                        <button class="btn btn-primary" id="saveSettingsBtn">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                    </div>
 
-                        <div class="card mt-4">
-                            <h3><i class="fas fa-bell"></i> Notification Preferences</h3>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <span>Desktop Notifications</span>
-                                    <small>Get notified when new messages arrive</small>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="desktopNotifications" checked>
-                                    <span class="slider"></span>
-                                </label>
+                    <!-- Notification Settings -->
+                    <div class="settings-section">
+                        <h2><i class="fas fa-bell"></i> Notifications</h2>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Desktop Notifications</h4>
+                                <p>Receive notifications for new messages</p>
                             </div>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <span>Sound Alerts</span>
-                                    <small>Play sound for new messages</small>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="soundAlerts">
-                                    <span class="slider"></span>
-                                </label>
+                            <label class="switch">
+                                <input type="checkbox" id="desktopNotifications" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Email Notifications</h4>
+                                <p>Get email summaries of unread messages</p>
                             </div>
+                            <label class="switch">
+                                <input type="checkbox" id="emailNotifications">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Sound Alerts</h4>
+                                <p>Play sound for new messages</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="soundAlerts" checked>
+                                <span class="slider"></span>
+                            </label>
                         </div>
                     </div>
 
-                    <div class="settings-panel">
-                        <div class="card">
-                            <h3><i class="fas fa-palette"></i> Appearance</h3>
-                            <div class="form-group">
-                                <label>Theme</label>
-                                <div class="theme-selector">
-                                    <button class="theme-btn active" data-theme="light">
-                                        <i class="fas fa-sun"></i> Light
-                                    </button>
-                                    <button class="theme-btn" data-theme="dark">
-                                        <i class="fas fa-moon"></i> Dark
-                                    </button>
-                                    <button class="theme-btn" data-theme="auto">
-                                        <i class="fas fa-adjust"></i> Auto
-                                    </button>
-                                </div>
+                    <!-- Appearance Settings -->
+                    <div class="settings-section">
+                        <h2><i class="fas fa-palette"></i> Appearance</h2>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Dark Mode</h4>
+                                <p>Switch between light and dark theme</p>
                             </div>
+                            <label class="switch">
+                                <input type="checkbox" id="darkModeToggle">
+                                <span class="slider"></span>
+                            </label>
                         </div>
-
-                        <div class="card mt-4">
-                            <h3><i class="fas fa-database"></i> Data Management</h3>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <span>Clear Chat History</span>
-                                    <small>Remove all conversation data</small>
-                                </div>
-                                <button class="btn btn-danger btn-sm" id="clearChats">
-                                    <i class="fas fa-trash"></i> Clear
-                                </button>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Compact Mode</h4>
+                                <p>Reduce spacing for more content</p>
                             </div>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <span>Export Data</span>
-                                    <small>Download all conversations as JSON</small>
-                                </div>
-                                <button class="btn btn-secondary btn-sm" id="exportData">
-                                    <i class="fas fa-download"></i> Export
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="card mt-4">
-                            <h3><i class="fas fa-info-circle"></i> Application Info</h3>
-                            <div class="app-info">
-                                <p><strong>Version:</strong> 2.0.0 Pro</p>
-                                <p><strong>Built with:</strong> Node.js, Express, Vanilla JS</p>
-                                <p><strong>API Provider:</strong> OpenRouter</p>
-                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="compactModeToggle">
+                                <span class="slider"></span>
+                            </label>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
         </main>
     </div>
-    
+
+    <!-- Connect Platform Modal -->
+    <div class="modal" id="connectModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="connectModalTitle">Connect Platform</h2>
+                <button class="modal-close" onclick="closeConnectModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="oauth-guide">
+                    <h3><i class="fas fa-info-circle"></i> How to Connect</h3>
+                    <ol id="oauthSteps">
+                        <!-- Steps will be populated dynamically -->
+                    </ol>
+                </div>
+                <form id="connectForm">
+                    <input type="hidden" id="connectPlatform">
+                    <div class="form-group">
+                        <label>Access Token</label>
+                        <textarea id="accessToken" rows="3" placeholder="Paste your access token here..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Page/Account ID</label>
+                        <input type="text" id="pageId" placeholder="Enter page or account ID">
+                    </div>
+                    <div class="form-group">
+                        <label>Page/Account Name</label>
+                        <input type="text" id="pageName" placeholder="Enter page or account name">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeConnectModal()">Cancel</button>
+                <button class="btn btn-primary" id="confirmConnectBtn">
+                    <i class="fas fa-link"></i> Connect
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prompt Modal -->
+    <div class="modal" id="promptModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="promptModalTitle">Create Prompt</h2>
+                <button class="modal-close" onclick="closePromptModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="promptForm">
+                    <input type="hidden" id="editPromptId">
+                    <div class="form-group">
+                        <label>Prompt Name</label>
+                        <input type="text" id="promptName" placeholder="e.g., Friendly Greeting">
+                    </div>
+                    <div class="form-group">
+                        <label>Prompt Content</label>
+                        <textarea id="promptContent" rows="6" placeholder="Describe how the AI should respond..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="promptActive" checked>
+                            <span>Active (use in AI responses)</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePromptModal()">Cancel</button>
+                <button class="btn btn-primary" id="savePromptBtn">
+                    <i class="fas fa-save"></i> Save Prompt
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
